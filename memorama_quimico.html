@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memorama de la Tabla Periódica - Luque Estudillo Jesús Miguel</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 750px;
+    }
+    h1 {
+      color: #4cc9f0;
+      font-size: 28px;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 10px rgba(76, 201, 240, 0.3);
+    }
+    .author-badge {
+      display: inline-block;
+      background: rgba(255, 209, 102, 0.15);
+      border: 1px solid rgba(255, 209, 102, 0.4);
+      color: #ffd166;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+    }
+    p.subtitle {
+      color: #a8dadc;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px 20px;
+      border-radius: 15px;
+      backdrop-filter: blur(8px);
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .stats {
+      font-size: 15px;
+      font-weight: bold;
+    }
+    .stats span {
+      color: #ffd166;
+      font-size: 18px;
+    }
+    select, button {
+      padding: 8px 15px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    select {
+      background: #1d3557;
+      color: #ffffff;
+      border: 1px solid #4cc9f0;
+    }
+    button.restart-btn {
+      background: #4cc9f0;
+      color: #0f2027;
+      transition: transform 0.1s;
+    }
+    button.restart-btn:hover {
+      transform: scale(1.05);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 750px;
+      perspective: 1000px;
+    }
+    .grid.large-grid {
+      grid-template-columns: repeat(6, 1fr);
+    }
+    .card {
+      height: 105px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s;
+      cursor: pointer;
+    }
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+    .card.matched {
+      transform: rotateY(180deg);
+      cursor: default;
+    }
+    .card.matched .card-back {
+      background: linear-gradient(135deg, #06d6a0, #118ab2);
+      border-color: #ffffff;
+      box-shadow: 0 0 15px rgba(6, 214, 160, 0.6);
+    }
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      user-select: none;
+    }
+    .card-front {
+      background: linear-gradient(135deg, #1d3557, #457b9d);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      font-size: 30px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .card-back {
+      background: #1b263b;
+      border: 2px solid #4cc9f0;
+      transform: rotateY(180deg);
+    }
+    .type-symbol .main-text {
+      font-size: 32px;
+      font-weight: 800;
+      color: #ffd166;
+    }
+    .type-symbol .sub-text {
+      font-size: 10px;
+      color: #a8dadc;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+    .type-info .atomic-num {
+      font-size: 11px;
+      color: #4cc9f0;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+    .type-info .main-text {
+      font-size: 15px;
+      font-weight: bold;
+      color: #ffffff;
+    }
+    .type-info .sub-text {
+      font-size: 10px;
+      color: #e0e1dd;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+    footer {
+      margin-top: auto;
+      padding-top: 25px;
+      text-align: center;
+      font-size: 14px;
+      color: #a8dadc;
+      opacity: 0.9;
+    }
+    footer strong {
+      color: #ffd166;
+    }
+    #win-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 32, 39, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      z-index: 10;
+    }
+    #win-modal h2 {
+      font-size: 36px;
+      color: #06d6a0;
+      margin-bottom: 10px;
+    }
+    #win-modal p {
+      font-size: 18px;
+      margin-bottom: 25px;
+    }
+    .hidden {
+      display: none !important;
+    }
+    @media (max-width: 600px) {
+      .grid.large-grid { grid-template-columns: repeat(4, 1fr); }
+      .card { height: 90px; }
+      .type-symbol .main-text { font-size: 24px; }
+      .type-info .main-text { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🧪 Memorama Químico</h1>
+    <div class="author-badge">Creado por Luque Estudillo Jesús Miguel</div>
+    <p class="subtitle">Encuentra la pareja de cada <b>Símbolo</b> con su <b>Elemento</b> correspondiente</p>
+    <div class="controls">
+      <div class="stats">Intentos: <span id="moves">0</span></div>
+      <div class="stats">Parejas: <span id="matches">0</span>/<span id="total-pairs">8</span></div>
+      <div>
+        <select id="difficulty" onchange="initGame()">
+          <option value="6">Fácil (12 cartas)</option>
+          <option value="8" selected>Normal (16 cartas)</option>
+          <option value="10">Difícil (20 cartas)</option>
+          <option value="14">Extremo (28 cartas)</option>
+          <option value="18">Experto (36 cartas)</option>
+        </select>
+        <button class="restart-btn" onclick="initGame()">Reiniciar</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid" id="game-grid"></div>
+
+  <footer>
+    Creado por <strong>Luque Estudillo Jesús Miguel</strong>
+  </footer>
+
+  <div id="win-modal" class="hidden">
+    <h2>🎉 ¡Tablero Completado!</h2>
+    <p id="win-message">Lo lograste en 0 intentos.</p>
+    <button class="restart-btn" style="padding: 15px 30px; font-size: 18px;" onclick="initGame()">JUGAR OTRA VEZ</button>
+  </div>
+
+  <script>
+    // Base de datos ampliada a 48 elementos
+    const elementsDB = [
+      { num: 1, symbol: "H", name: "Hidrógeno", cat: "No metal" },
+      { num: 2, symbol: "He", name: "Helio", cat: "Gas noble" },
+      { num: 3, symbol: "Li", name: "Litio", cat: "Metal alcalino" },
+      { num: 4, symbol: "Be", name: "Berilio", cat: "Alcalinotérreo" },
+      { num: 5, symbol: "B", name: "Boro", cat: "Metaloide" },
+      { num: 6, symbol: "C", name: "Carbono", cat: "No metal" },
+      { num: 7, symbol: "N", name: "Nitrógeno", cat: "No metal" },
+      { num: 8, symbol: "O", name: "Oxígeno", cat: "No metal" },
+      { num: 9, symbol: "F", name: "Flúor", cat: "Halógeno" },
+      { num: 10, symbol: "Ne", name: "Neón", cat: "Gas noble" },
+      { num: 11, symbol: "Na", name: "Sodio", cat: "Metal alcalino" },
+      { num: 12, symbol: "Mg", name: "Magnesio", cat: "Alcalinotérreo" },
+      { num: 13, symbol: "Al", name: "Aluminio", cat: "Metal" },
+      { num: 14, symbol: "Si", name: "Silicio", cat: "Metaloide" },
+      { num: 15, symbol: "P", name: "Fósforo", cat: "No metal" },
+      { num: 16, symbol: "S", name: "Azufre", cat: "No metal" },
+      { num: 17, symbol: "Cl", name: "Cloro", cat: "Halógeno" },
+      { num: 18, symbol: "Ar", name: "Argón", cat: "Gas noble" },
+      { num: 19, symbol: "K", name: "Potasio", cat: "Metal alcalino" },
+      { num: 20, symbol: "Ca", name: "Calcio", cat: "Alcalinotérreo" },
+      { num: 22, symbol: "Ti", name: "Titanio", cat: "Transición" },
+      { num: 24, symbol: "Cr", name: "Cromo", cat: "Transición" },
+      { num: 25, symbol: "Mn", name: "Manganeso", cat: "Transición" },
+      { num: 26, symbol: "Fe", name: "Hierro", cat: "Transición" },
+      { num: 27, symbol: "Co", name: "Cobalto", cat: "Transición" },
+      { num: 28, symbol: "Ni", name: "Níquel", cat: "Transición" },
+      { num: 29, symbol: "Cu", name: "Cobre", cat: "Transición" },
+      { num: 30, symbol: "Zn", name: "Zinc", cat: "Transición" },
+      { num: 33, symbol: "As", name: "Arsénico", cat: "Metaloide" },
+      { num: 35, symbol: "Br", name: "Bromo", cat: "Halógeno" },
+      { num: 36, symbol: "Kr", name: "Kriptón", cat: "Gas noble" },
+      { num: 47, symbol: "Ag", name: "Plata", cat: "Transición" },
+      { num: 50, symbol: "Sn", name: "Estaño", cat: "Metal" },
+      { num: 53, symbol: "I", name: "Yodo", cat: "Halógeno" },
+      { num: 54, symbol: "Xe", name: "Xenón", cat: "Gas noble" },
+      { num: 55, symbol: "Cs", name: "Cesio", cat: "Metal alcalino" },
+      { num: 56, symbol: "Ba", name: "Bario", cat: "Alcalinotérreo" },
+      { num: 74, symbol: "W", name: "Wolframio", cat: "Transición" },
+      { num: 78, symbol: "Pt", name: "Platino", cat: "Transición" },
+      { num: 79, symbol: "Au", name: "Oro", cat: "Transición" },
+      { num: 80, symbol: "Hg", name: "Mercurio", cat: "Transición" },
+      { num: 82, symbol: "Pb", name: "Plomo", cat: "Metal" },
+      { num: 86, symbol: "Rn", name: "Radón", cat: "Gas noble" },
+      { num: 88, symbol: "Ra", name: "Radio", cat: "Alcalinotérreo" },
+      { num: 92, symbol: "U", name: "Uranio", cat: "Actínido" },
+      { num: 94, symbol: "Pu", name: "Plutonio", cat: "Actínido" },
+      { num: 95, symbol: "Am", name: "Americio", cat: "Actínido" },
+      { num: 118, symbol: "Og", name: "Oganesón", cat: "Gas noble" }
+    ];
+
+    let flippedCards = [];
+    let matchedPairs = 0;
+    let totalPairs = 8;
+    let moves = 0;
+    let lockBoard = false;
+
+    const grid = document.getElementById('game-grid');
+    const movesEl = document.getElementById('moves');
+    const matchesEl = document.getElementById('matches');
+    const totalPairsEl = document.getElementById('total-pairs');
+    const winModal = document.getElementById('win-modal');
+    const winMessage = document.getElementById('win-message');
+
+    function initGame() {
+      totalPairs = parseInt(document.getElementById('difficulty').value);
+      flippedCards = [];
+      matchedPairs = 0;
+      moves = 0;
+      lockBoard = false;
+
+      if (totalPairs >= 14) {
+        grid.classList.add('large-grid');
+      } else {
+        grid.classList.remove('large-grid');
+      }
+
+      movesEl.textContent = moves;
+      matchesEl.textContent = matchedPairs;
+      totalPairsEl.textContent = totalPairs;
+      winModal.classList.add('hidden');
+      grid.innerHTML = '';
+
+      const selectedElements = [...elementsDB]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, totalPairs);
+
+      let deck = [];
+      selectedElements.forEach(el => {
+        deck.push({
+          id: el.num,
+          type: 'symbol',
+          html: `<div class="main-text">${el.symbol}</div><div class="sub-text">Símbolo</div>`
+        });
+        deck.push({
+          id: el.num,
+          type: 'info',
+          html: `<div class="atomic-num">N.º ${el.num}</div><div class="main-text">${el.name}</div><div class="sub-text">${el.cat}</div>`
+        });
+      });
+
+      deck.sort(() => Math.random() - 0.5);
+
+      deck.forEach(cardData => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.id = cardData.id;
+
+        card.innerHTML = `
+          <div class="card-face card-front">⚛️</div>
+          <div class="card-face card-back type-${cardData.type}">
+            ${cardData.html}
+          </div>
+        `;
+
+        card.addEventListener('click', () => flipCard(card));
+        grid.appendChild(card);
+      });
+    }
+
+    function flipCard(card) {
+      if (lockBoard) return;
+      if (card === flippedCards[0]) return;
+      if (card.classList.contains('matched')) return;
+
+      card.classList.add('flipped');
+      flippedCards.push(card);
+
+      if (flippedCards.length === 2) {
+        moves++;
+        movesEl.textContent = moves;
+        checkForMatch();
+      }
+    }
+
+    function checkForMatch() {
+      const [card1, card2] = flippedCards;
+      const isMatch = card1.dataset.id === card2.dataset.id;
+
+      if (isMatch) {
+        card1.classList.add('matched');
+        card2.classList.add('matched');
+        matchedPairs++;
+        matchesEl.textContent = matchedPairs;
+        flippedCards = [];
+
+        if (matchedPairs === totalPairs) {
+          setTimeout(() => {
+            const difficultySelect = document.getElementById('difficulty');
+            const levelName = difficultySelect.options[difficultySelect.selectedIndex].text.split(' ')[0];
+            winMessage.innerHTML = `Completaste el nivel <b>${levelName}</b> (${totalPairs} parejas) en <b>${moves} intentos</b>.`;
+            winModal.classList.remove('hidden');
+          }, 600);
+        }
+      } else {
+        lockBoard = true;
+        setTimeout(() => {
+          card1.classList.remove('flipped');
+          card2.classList.remove('flipped');
+          flippedCards = [];
+          lockBoard = false;
+        }, 1000);
+      }
+    }
+
+    initGame();
+  </script>
+</body>
+</html>

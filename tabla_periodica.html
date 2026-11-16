@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desafío Tabla Periódica - Luque Estudillo Jesús Miguel</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #1a2a6c, #2b5876, #4e4376);
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .game-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+    .author-badge {
+      display: inline-block;
+      background: rgba(255, 209, 102, 0.15);
+      border: 1px solid rgba(255, 209, 102, 0.4);
+      color: #ffd166;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 18px;
+      letter-spacing: 0.5px;
+    }
+    .header-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      font-size: 16px;
+      font-weight: bold;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 12px 20px;
+      border-radius: 12px;
+    }
+    .stat span {
+      color: #ffd166;
+      font-size: 18px;
+    }
+    .element-box {
+      width: 130px;
+      height: 140px;
+      margin: 0 auto 20px auto;
+      border: 3px solid #ffffff;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s;
+    }
+    .el-number {
+      text-align: left;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .el-symbol {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .el-name {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.9;
+    }
+    .question-text {
+      font-size: 20px;
+      margin-bottom: 20px;
+      line-height: 1.4;
+      min-height: 56px;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    button.option-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 15px 10px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button.option-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    button.correct {
+      background: #06d6a0 !important;
+      border-color: #06d6a0 !important;
+      color: #0b132b !important;
+    }
+    button.wrong {
+      background: #ef476f !important;
+      border-color: #ef476f !important;
+    }
+    .feedback {
+      min-height: 24px;
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .main-btn {
+      background: #ffd166;
+      color: #1a2a6c;
+      border: none;
+      padding: 15px 35px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255, 209, 102, 0.4);
+      transition: transform 0.2s;
+    }
+    .main-btn:hover {
+      transform: scale(1.05);
+    }
+    .card-footer {
+      margin-top: 22px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 13px;
+      color: #e0e1dd;
+      opacity: 0.9;
+    }
+    .card-footer strong {
+      color: #ffd166;
+    }
+    .hidden {
+      display: none !important;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #ffd166;
+    }
+    p.intro {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 25px;
+      color: #e0e1dd;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-card">
+    <!-- Pantalla de Inicio -->
+    <div id="start-screen">
+      <h1>⚛️ Desafío Químico</h1>
+      <div class="author-badge">Creado por Luque Estudillo Jesús Miguel</div>
+      <p class="intro">Pon a prueba tus conocimientos de la Tabla Periódica. Tienes <b>90 segundos</b> para identificar símbolos, números atómicos y propiedades de los elementos.</p>
+      <button class="main-btn" onclick="startGame()">COMENZAR JUEGO</button>
+    </div>
+
+    <!-- Pantalla de Juego -->
+    <div id="play-screen" class="hidden">
+      <div class="header-stats">
+        <div class="stat">Tiempo: <span id="timer">90</span>s</div>
+        <div class="stat">Racha: <span id="streak">0</span>🔥</div>
+        <div class="stat">Puntos: <span id="score">0</span></div>
+      </div>
+
+      <div class="element-box" id="card-display">
+        <div class="el-number" id="card-number">?</div>
+        <div class="el-symbol" id="card-symbol">?</div>
+        <div class="el-name" id="card-name">???</div>
+      </div>
+
+      <div class="question-text" id="question-text">Cargando pregunta...</div>
+
+      <div class="options-grid" id="options-container"></div>
+
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <!-- Pantalla Final -->
+    <div id="end-screen" class="hidden">
+      <h1>¡Tiempo Terminado!</h1>
+      <p class="intro" id="final-stats">Tu puntuación final fue: 0</p>
+      <button class="main-btn" onclick="startGame()">JUGAR DE NUEVO</button>
+    </div>
+
+    <div class="card-footer">
+      Creado por <strong>Luque Estudillo Jesús Miguel</strong>
+    </div>
+  </div>
+
+  <script>
+    // Base de datos de 48 elementos
+    const elements = [
+      { number: 1, symbol: "H", name: "Hidrógeno", category: "No metal", clue: "El elemento más ligero y abundante del universo." },
+      { number: 2, symbol: "He", name: "Helio", category: "Gas noble", clue: "Se usa para inflar globos que flotan." },
+      { number: 6, symbol: "C", name: "Carbono", category: "No metal", clue: "La base química de toda la vida orgánica." },
+      { number: 7, symbol: "N", name: "Nitrógeno", category: "No metal", clue: "Constituye el 78% del aire que respiramos." },
+      { number: 8, symbol: "O", name: "Oxígeno", category: "No metal", clue: "Indispensable para la respiración celular." },
+      { number: 10, symbol: "Ne", name: "Neón", category: "Gas noble", clue: "Brilla de color rojo-anaranjado en letreros luminosos." },
+      { number: 11, symbol: "Na", name: "Sodio", category: "Metal alcalino", clue: "Junto con el cloro forma la sal de mesa." },
+      { number: 12, symbol: "Mg", name: "Magnesio", category: "Metal alcalinotérreo", clue: "Metal ligero presente en la clorofila de las plantas." },
+      { number: 13, symbol: "Al", name: "Aluminio", category: "Metal del bloque p", clue: "Metal muy ligero usado en latas y aviones." },
+      { number: 17, symbol: "Cl", name: "Cloro", category: "Halógeno", clue: "Se utiliza para desinfectar el agua de las piscinas." },
+      { number: 19, symbol: "K", name: "Potasio", category: "Metal alcalino", clue: "Mineral esencial abundante en los plátanos." },
+      { number: 20, symbol: "Ca", name: "Calcio", category: "Metal alcalinotérreo", clue: "Fundamental para fortalecer huesos y dientes." },
+      { number: 26, symbol: "Fe", name: "Hierro", category: "Metal de transición", clue: "Su símbolo viene del latín 'Ferrum' y está en nuestra sangre." },
+      { number: 29, symbol: "Cu", name: "Cobre", category: "Metal de transición", clue: "Metal rojizo excelente conductor de electricidad." },
+      { number: 47, symbol: "Ag", name: "Plata", category: "Metal de transición", clue: "Metal precioso cuyo símbolo viene del latín 'Argentum'." },
+      { number: 79, symbol: "Au", name: "Oro", category: "Metal de transición", clue: "Metal precioso inoxidable cuyo símbolo viene de 'Aurum'." },
+      { number: 80, symbol: "Hg", name: "Mercurio", category: "Metal de transición", clue: "El único metal que es líquido a temperatura ambiente." },
+      { number: 82, symbol: "Pb", name: "Plomo", category: "Metal del bloque p", clue: "Metal muy denso usado para bloquear radiación." },
+      { number: 3, symbol: "Li", name: "Litio", category: "Metal alcalino", clue: "El metal más ligero, esencial para las baterías de celulares." },
+      { number: 4, symbol: "Be", name: "Berilio", category: "Metal alcalinotérreo", clue: "Se encuentra en piedras preciosas como la esmeralda." },
+      { number: 5, symbol: "B", name: "Boro", category: "Metaloide", clue: "Se usa para fabricar vidrio resistente al calor (Pyrex)." },
+      { number: 9, symbol: "F", name: "Flúor", category: "Halógeno", clue: "El elemento más reactivo; se añade a la pasta de dientes." },
+      { number: 14, symbol: "Si", name: "Silicio", category: "Metaloide", clue: "El segundo elemento más abundante en la corteza terrestre; base de los microchips." },
+      { number: 15, symbol: "P", name: "Fósforo", category: "No metal", clue: "Presente en nuestro ADN y en la cabeza de los cerillos." },
+      { number: 16, symbol: "S", name: "Azufre", category: "No metal", clue: "Mineral amarillo asociado a volcanes con un olor característico." },
+      { number: 18, symbol: "Ar", name: "Argón", category: "Gas noble", clue: "Gas inerte que rellena el interior de los focos incandescentes." },
+      { number: 22, symbol: "Ti", name: "Titanio", category: "Metal de transición", clue: "Metal súper resistente y ligero usado en naves espaciales e implantes médicos." },
+      { number: 24, symbol: "Cr", name: "Cromo", category: "Metal de transición", clue: "Se usa para dar un acabado brillante e inoxidable al acero." },
+      { number: 25, symbol: "Mn", name: "Manganeso", category: "Metal de transición", clue: "Esencial para producir acero resistente y pilas alcalinas." },
+      { number: 27, symbol: "Co", name: "Cobalto", category: "Metal de transición", clue: "Produce un color azul intenso en vidrios y cerámicas." },
+      { number: 28, symbol: "Ni", name: "Níquel", category: "Metal de transición", clue: "Metal magnético muy usado para acuñar monedas." },
+      { number: 30, symbol: "Zn", name: "Zinc", category: "Metal de transición", clue: "Protege el hierro contra la oxidación (galvanizado)." },
+      { number: 33, symbol: "As", name: "Arsénico", category: "Metaloide", clue: "Famoso históricamente por ser un veneno muy potente." },
+      { number: 35, symbol: "Br", name: "Bromo", category: "Halógeno", clue: "El único elemento no metálico que es líquido a temperatura ambiente." },
+      { number: 36, symbol: "Kr", name: "Kriptón", category: "Gas noble", clue: "Gas noble que comparte nombre con el planeta natal de Superman." },
+      { number: 50, symbol: "Sn", name: "Estaño", category: "Metal del bloque p", clue: "Se mezcla con cobre para fabricar bronce." },
+      { number: 53, symbol: "I", name: "Yodo", category: "Halógeno", clue: "Se usa como antiséptico para heridas y es vital para la tiroides." },
+      { number: 54, symbol: "Xe", name: "Xenón", category: "Gas noble", clue: "Gas usado en los faros de alta intensidad de algunos automóviles." },
+      { number: 55, symbol: "Cs", name: "Cesio", category: "Metal alcalino", clue: "Se utiliza en los relojes atómicos más precisos del mundo." },
+      { number: 56, symbol: "Ba", name: "Bario", category: "Metal alcalinotérreo", clue: "Da el color verde brillante en los fuegos artificiales." },
+      { number: 74, symbol: "W", name: "Wolframio", category: "Metal de transición", clue: "También llamado Tungsteno; tiene el punto de fusión más alto de todos los metales." },
+      { number: 78, symbol: "Pt", name: "Platino", category: "Metal de transición", clue: "Metal precioso más raro y valioso que el oro." },
+      { number: 86, symbol: "Rn", name: "Radón", category: "Gas noble", clue: "Un gas noble natural que además es radiactivo." },
+      { number: 88, symbol: "Ra", name: "Radio", category: "Metal alcalinotérreo", clue: "Elemento radiactivo que brilla en la oscuridad, descubierto por Marie Curie." },
+      { number: 92, symbol: "U", name: "Uranio", category: "Actínido", clue: "Elemento pesado usado como combustible en reactores nucleares." },
+      { number: 94, symbol: "Pu", name: "Plutonio", category: "Actínido", clue: "Elemento radiactivo usado como fuente de energía en sondas espaciales." },
+      { number: 95, symbol: "Am", name: "Americio", category: "Actínido", clue: "Elemento sintético que se encuentra dentro de los detectores de humo caseros." },
+      { number: 118, symbol: "Og", name: "Oganesón", category: "Gas noble", clue: "El elemento con el número atómico más alto de toda la tabla periódica." }
+    ];
+
+    let score = 0;
+    let streak = 0;
+    let timeLeft = 90;
+    let timerInterval;
+    let currentCorrectAnswer = "";
+    let canAnswer = true;
+
+    const startScreen = document.getElementById('start-screen');
+    const playScreen = document.getElementById('play-screen');
+    const endScreen = document.getElementById('end-screen');
+    
+    const timerEl = document.getElementById('timer');
+    const streakEl = document.getElementById('streak');
+    const scoreEl = document.getElementById('score');
+    
+    const cardNumber = document.getElementById('card-number');
+    const cardSymbol = document.getElementById('card-symbol');
+    const cardName = document.getElementById('card-name');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const feedbackEl = document.getElementById('feedback');
+
+    function startGame() {
+      score = 0;
+      streak = 0;
+      timeLeft = 90;
+      scoreEl.textContent = score;
+      streakEl.textContent = streak;
+      timerEl.textContent = timeLeft;
+
+      startScreen.classList.add('hidden');
+      endScreen.classList.add('hidden');
+      playScreen.classList.remove('hidden');
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+
+      nextQuestion();
+    }
+
+    function nextQuestion() {
+      canAnswer = true;
+      feedbackEl.textContent = "";
+      optionsContainer.innerHTML = "";
+
+      const target = elements[Math.floor(Math.random() * elements.length)];
+      const questionType = Math.floor(Math.random() * 3);
+
+      let options = [];
+
+      if (questionType === 0) {
+        cardNumber.textContent = target.number;
+        cardSymbol.textContent = target.symbol;
+        cardName.textContent = "???";
+        questionText.textContent = `¿Qué elemento tiene el símbolo "${target.symbol}"?`;
+        currentCorrectAnswer = target.name;
+        options = generateOptions(target.name, 'name');
+
+      } else if (questionType === 1) {
+        cardNumber.textContent = "?";
+        cardSymbol.textContent = "?";
+        cardName.textContent = target.category;
+        questionText.textContent = `Pista: ${target.clue}`;
+        currentCorrectAnswer = `${target.symbol} (${target.name})`;
+        
+        const distractors = getRandomElements(target, 3).map(el => `${el.symbol} (${el.name})`);
+        options = shuffleArray([currentCorrectAnswer, ...distractors]);
+
+      } else {
+        cardNumber.textContent = "?";
+        cardSymbol.textContent = target.symbol;
+        cardName.textContent = target.name;
+        questionText.textContent = `¿Cuál es el número atómico del ${target.name}?`;
+        currentCorrectAnswer = target.number.toString();
+        options = generateOptions(target.number.toString(), 'number');
+      }
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(btn, opt, target);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function getRandomElements(excludeEl, count) {
+      const filtered = elements.filter(el => el.symbol !== excludeEl.symbol);
+      return shuffleArray(filtered).slice(0, count);
+    }
+
+    function generateOptions(correctVal, field) {
+      const distractors = getRandomElements({ symbol: "" }, 10)
+        .map(el => el[field].toString())
+        .filter(val => val !== correctVal);
+      const uniqueDistractors = [...new Set(distractors)].slice(0, 3);
+      return shuffleArray([correctVal, ...uniqueDistractors]);
+    }
+
+    function shuffleArray(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function checkAnswer(selectedBtn, chosenAnswer, targetElement) {
+      if (!canAnswer) return;
+      canAnswer = false;
+
+      cardNumber.textContent = targetElement.number;
+      cardSymbol.textContent = targetElement.symbol;
+      cardName.textContent = targetElement.name;
+
+      const allButtons = document.querySelectorAll('.option-btn');
+      allButtons.forEach(btn => btn.disabled = true);
+
+      if (chosenAnswer === currentCorrectAnswer) {
+        selectedBtn.classList.add('correct');
+        streak++;
+        const pointsEarned = 10 + (streak * 2);
+        score += pointsEarned;
+        feedbackEl.style.color = "#06d6a0";
+        feedbackEl.textContent = `¡Correcto! +${pointsEarned} puntos`;
+      } else {
+        selectedBtn.classList.add('wrong');
+        streak = 0;
+        feedbackEl.style.color = "#ef476f";
+        feedbackEl.textContent = `Incorrecto. Era: ${currentCorrectAnswer}`;
+        
+        allButtons.forEach(btn => {
+          if (btn.textContent === currentCorrectAnswer) {
+            btn.classList.add('correct');
+          }
+        });
+      }
+
+      scoreEl.textContent = score;
+      streakEl.textContent = streak;
+
+      setTimeout(() => {
+        if (timeLeft > 0) nextQuestion();
+      }, 1300);
+    }
+
+    function endGame() {
+      clearInterval(timerInterval);
+      playScreen.classList.add('hidden');
+      endScreen.classList.remove('hidden');
+      document.getElementById('final-stats').innerHTML = 
+        `Lograste <b style="color:#ffd166; font-size:24px;">${score} puntos</b> en 90 segundos.<br>¿Puedes superar tu propio récord?`;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clasificador Químico - Luque Estudillo Jesús Miguel</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #232526, #414345);
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+    /* Esquina superior para el concurso */
+    .contest-banner {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(76, 201, 240, 0.15);
+      border: 1px solid #4cc9f0;
+      color: #4cc9f0;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      max-width: 250px;
+      text-align: right;
+    }
+    .game-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+      text-align: center;
+      margin-top: 30px;
+    }
+    .author-badge {
+      display: inline-block;
+      background: rgba(255, 209, 102, 0.15);
+      border: 1px solid rgba(255, 209, 102, 0.4);
+      color: #ffd166;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 15px;
+      letter-spacing: 0.5px;
+    }
+    .header-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      font-size: 15px;
+      font-weight: bold;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px 15px;
+      border-radius: 10px;
+    }
+    .stat span {
+      color: #4cc9f0;
+      font-size: 17px;
+    }
+    .element-card-display {
+      width: 150px;
+      height: 160px;
+      margin: 0 auto 20px auto;
+      border: 3px solid #4cc9f0;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px;
+      background: rgba(76, 201, 240, 0.1);
+      box-shadow: 0 8px 25px rgba(76, 201, 240, 0.2);
+    }
+    .el-num {
+      text-align: left;
+      font-size: 16px;
+      font-weight: bold;
+      color: #4cc9f0;
+    }
+    .el-sym {
+      font-size: 52px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 1px;
+    }
+    .el-nam {
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #ffd166;
+    }
+    .instruction-text {
+      font-size: 18px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      color: #e0e1dd;
+    }
+    .categories-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+    button.cat-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      color: white;
+      padding: 14px 10px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button.cat-btn:hover:not(:disabled) {
+      background: rgba(76, 201, 240, 0.3);
+      border-color: #4cc9f0;
+      transform: translateY(-2px);
+    }
+    button.correct-choice {
+      background: #06d6a0 !important;
+      border-color: #06d6a0 !important;
+      color: #0b132b !important;
+    }
+    button.wrong-choice {
+      background: #ef476f !important;
+      border-color: #ef476f !important;
+    }
+    .feedback-msg {
+      min-height: 24px;
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .main-btn {
+      background: #4cc9f0;
+      color: #0f2027;
+      border: none;
+      padding: 14px 30px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
+      transition: transform 0.2s;
+    }
+    .main-btn:hover {
+      transform: scale(1.05);
+    }
+    .card-footer {
+      margin-top: 20px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 13px;
+      color: #e0e1dd;
+      opacity: 0.9;
+    }
+    .card-footer strong {
+      color: #ffd166;
+    }
+    .hidden {
+      display: none !important;
+    }
+    h1 {
+      font-size: 30px;
+      margin-bottom: 6px;
+      color: #4cc9f0;
+    }
+    p.intro {
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      color: #e0e1dd;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Distintivo de esquina requerido -->
+  <div class="contest-banner">
+    Juegos creados para concurso de tabla periódica
+  </div>
+
+  <div class="game-card">
+    <!-- Pantalla de Inicio -->
+    <div id="start-screen">
+      <h1>⚗️ Clasificador Químico</h1>
+      <div class="author-badge">Creado por Luque Estudillo Jesús Miguel</div>
+      <p class="intro">Pon a prueba tu agilidad mental. Observa el elemento y clasifícalo rápidamente en su familia o categoría correcta antes de que se agote el tiempo.</p>
+      <button class="main-btn" onclick="startGame()">INICIAR RETO</button>
+    </div>
+
+    <!-- Pantalla de Juego -->
+    <div id="play-screen" class="hidden">
+      <div class="header-stats">
+        <div>Ronda: <span id="round">1</span>/15</div>
+        <div>Aciertos: <span id="score">0</span></div>
+        <div>⏱️ <span id="timer">10</span>s</div>
+      </div>
+
+      <div class="element-card-display">
+        <div class="el-num" id="disp-num">?</div>
+        <div class="el-sym" id="disp-sym">?</div>
+        <div class="el-nam" id="disp-nam">???</div>
+      </div>
+
+      <div class="instruction-text">¿A qué categoría pertenece?</div>
+
+      <div class="categories-grid" id="categories-container"></div>
+
+      <div class="feedback-msg" id="feedback"></div>
+    </div>
+
+    <!-- Pantalla Final -->
+    <div id="end-screen" class="hidden">
+      <h1>¡Reto Finalizado!</h1>
+      <div class="author-badge">Creado por Luque Estudillo Jesús Miguel</div>
+      <p class="intro" id="final-stats">Has completado todas las rondas.</p>
+      <button class="main-btn" onclick="startGame()">JUGAR DE NUEVO</button>
+    </div>
+
+    <div class="card-footer">
+      Creado por <strong>Luque Estudillo Jesús Miguel</strong>
+    </div>
+  </div>
+
+  <script>
+    // Base de datos completa con los 48 elementos y sus categorías oficiales
+    const elementsDB = [
+      { num: 1, symbol: "H", name: "Hidrógeno", cat: "No metal" },
+      { num: 2, symbol: "He", name: "Helio", cat: "Gas noble" },
+      { num: 3, symbol: "Li", name: "Litio", cat: "Metal alcalino" },
+      { num: 4, symbol: "Be", name: "Berilio", cat: "Metal alcalinotérreo" },
+      { num: 5, symbol: "B", name: "Boro", cat: "Metaloide" },
+      { num: 6, symbol: "C", name: "Carbono", cat: "No metal" },
+      { num: 7, symbol: "N", name: "Nitrógeno", cat: "No metal" },
+      { num: 8, symbol: "O", name: "Oxígeno", cat: "No metal" },
+      { num: 9, symbol: "F", name: "Flúor", cat: "Halógeno" },
+      { num: 10, symbol: "Ne", name: "Neón", cat: "Gas noble" },
+      { num: 11, symbol: "Na", name: "Sodio", cat: "Metal alcalino" },
+      { num: 12, symbol: "Mg", name: "Magnesio", cat: "Metal alcalinotérreo" },
+      { num: 13, symbol: "Al", name: "Aluminio", cat: "Metal del bloque p" },
+      { num: 14, symbol: "Si", name: "Silicio", cat: "Metaloide" },
+      { num: 15, symbol: "P", name: "Fósforo", cat: "No metal" },
+      { num: 16, symbol: "S", name: "Azufre", cat: "No metal" },
+      { num: 17, symbol: "Cl", name: "Cloro", cat: "Halógeno" },
+      { num: 18, symbol: "Ar", name: "Argón", cat: "Gas noble" },
+      { num: 19, symbol: "K", name: "Potasio", cat: "Metal alcalino" },
+      { num: 20, symbol: "Ca", name: "Calcio", cat: "Metal alcalinotérreo" },
+      { num: 22, symbol: "Ti", name: "Titanio", cat: "Metal de transición" },
+      { num: 24, symbol: "Cr", name: "Cromo", cat: "Metal de transición" },
+      { num: 25, symbol: "Mn", name: "Manganeso", cat: "Metal de transición" },
+      { num: 26, symbol: "Fe", name: "Hierro", cat: "Metal de transición" },
+      { num: 27, symbol: "Co", name: "Cobalto", cat: "Metal de transición" },
+      { num: 28, symbol: "Ni", name: "Níquel", cat: "Metal de transición" },
+      { num: 29, symbol: "Cu", name: "Cobre", cat: "Metal de transición" },
+      { num: 30, symbol: "Zn", name: "Zinc", cat: "Metal de transición" },
+      { num: 33, symbol: "As", name: "Arsénico", cat: "Metaloide" },
+      { num: 35, symbol: "Br", name: "Bromo", cat: "Halógeno" },
+      { num: 36, symbol: "Kr", name: "Kriptón", cat: "Gas noble" },
+      { num: 47, symbol: "Ag", name: "Plata", cat: "Metal de transición" },
+      { num: 50, symbol: "Sn", name: "Estaño", cat: "Metal del bloque p" },
+      { num: 53, symbol: "I", name: "Yodo", cat: "Halógeno" },
+      { num: 54, symbol: "Xe", name: "Xenón", cat: "Gas noble" },
+      { num: 55, symbol: "Cs", name: "Cesio", cat: "Metal alcalino" },
+      { num: 56, symbol: "Ba", name: "Bario", cat: "Metal alcalinotérreo" },
+      { num: 74, symbol: "W", name: "Wolframio", cat: "Metal de transición" },
+      { num: 78, symbol: "Pt", name: "Platino", cat: "Metal de transición" },
+      { num: 79, symbol: "Au", name: "Oro", cat: "Metal de transición" },
+      { num: 80, symbol: "Hg", name: "Mercurio", cat: "Metal de transición" },
+      { num: 82, symbol: "Pb", name: "Plomo", cat: "Metal del bloque p" },
+      { num: 86, symbol: "Rn", name: "Radón", cat: "Gas noble" },
+      { num: 88, symbol: "Ra", name: "Radio", cat: "Metal alcalinotérreo" },
+      { num: 92, symbol: "U", name: "Uranio", cat: "Actínido" },
+      { num: 94, symbol: "Pu", name: "Plutonio", cat: "Actínido" },
+      { num: 95, symbol: "Am", name: "Americio", cat: "Actínido" },
+      { num: 118, symbol: "Og", name: "Oganesón", cat: "Gas noble" }
+    ];
+
+    const allCategories = [
+      "No metal", "Gas noble", "Metal alcalino", "Metal alcalinotérreo", 
+      "Metal del bloque p", "Metal de transición", "Metaloide", "Halógeno", "Actínido"
+    ];
+
+    let currentRound = 1;
+    let score = 0;
+    let maxRounds = 15;
+    let currentElement = null;
+    let timer;
+    let timeLeft = 10;
+    let canClick = true;
+
+    const startScreen = document.getElementById('start-screen');
+    const playScreen = document.getElementById('play-screen');
+    const endScreen = document.getElementById('end-screen');
+    const roundEl = document.getElementById('round');
+    const scoreEl = document.getElementById('score');
+    const timerEl = document.getElementById('timer');
+    const dispNum = document.getElementById('disp-num');
+    const dispSym = document.getElementById('disp-sym');
+    const dispNam = document.getElementById('disp-nam');
+    const categoriesContainer = document.getElementById('categories-container');
+    const feedbackEl = document.getElementById('feedback');
+    const finalStats = document.getElementById('final-stats');
+
+    function startGame() {
+      currentRound = 1;
+      score = 0;
+      scoreEl.textContent = score;
+      roundEl.textContent = currentRound;
+      startScreen.classList.add('hidden');
+      endScreen.classList.add('hidden');
+      playScreen.classList.remove('hidden');
+      nextRound();
+    }
+
+    function nextRound() {
+      if (currentRound > maxRounds) {
+        endGame();
+        return;
+      }
+
+      roundEl.textContent = currentRound;
+      canClick = true;
+      feedbackEl.textContent = "";
+      timeLeft = 10;
+      timerEl.textContent = timeLeft;
+
+      // Seleccionar elemento aleatorio
+      currentElement = elementsDB[Math.floor(Math.random() * elementsDB.length)];
+      dispNum.textContent = currentElement.num;
+      dispSym.textContent = currentElement.symbol;
+      dispNam.textContent = currentElement.name;
+
+      // Generar opciones (1 correcta + 3 incorrectas únicas)
+      let incorrectCats = allCategories.filter(c => c !== currentElement.cat);
+      incorrectCats.sort(() => Math.random() - 0.5);
+      let options = [currentElement.cat, incorrectCats[0], incorrectCats[1], incorrectCats[2]];
+      options.sort(() => Math.random() - 0.5);
+
+      categoriesContainer.innerHTML = "";
+      options.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'cat-btn';
+        btn.textContent = cat;
+        btn.onclick = () => checkAnswer(btn, cat);
+        categoriesContainer.appendChild(btn);
+      });
+
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function checkAnswer(selectedBtn, chosenCat) {
+      if (!canClick) return;
+      canClick = false;
+      clearInterval(timer);
+
+      const allBtns = document.querySelectorAll('.cat-btn');
+      allBtns.forEach(b => b.disabled = true);
+
+      if (chosenCat === currentElement.cat) {
+        selectedBtn.classList.add('correct-choice');
+        score += 10 + (timeLeft * 2); // Bonificación por velocidad
+        scoreEl.textContent = score;
+        feedbackEl.style.color = "#06d6a0";
+        feedbackEl.textContent = "¡Correcto! Excelente velocidad.";
+      } else {
+        selectedBtn.classList.add('wrong-choice');
+        feedbackEl.style.color = "#ef476f";
+        feedbackEl.textContent = `Incorrecto. Era: ${currentElement.cat}`;
+        allBtns.forEach(b => {
+          if (b.textContent === currentElement.cat) {
+            b.classList.add('correct-choice');
+          }
+        });
+      }
+
+      setTimeout(() => {
+        currentRound++;
+        nextRound();
+      }, 1400);
+    }
+
+    function handleTimeout() {
+      if (!canClick) return;
+      canClick = false;
+
+      feedbackEl.style.color = "#ef476f";
+      feedbackEl.textContent = `¡Se acabó el tiempo! Era: ${currentElement.cat}`;
+
+      const allBtns = document.querySelectorAll('.cat-btn');
+      allBtns.forEach(b => {
+        b.disabled = true;
+        if (b.textContent === currentElement.cat) {
+          b.classList.add('correct-choice');
+        }
+      });
+
+      setTimeout(() => {
+        currentRound++;
+        nextRound();
+      }, 1400);
+    }
+
+    function endGame() {
+      clearInterval(timer);
+      playScreen.classList.add('hidden');
+      endScreen.classList.remove('hidden');
+      finalStats.innerHTML = `Lograste acumular <b style="color:#4cc9f0; font-size:24px;">${score} puntos</b> en las ${maxRounds} rondas.<br>¡Listo para destacar en el concurso!`;
+    }
+  </script>
+</body>
+</html>
